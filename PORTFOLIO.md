@@ -9,13 +9,13 @@
 
 ### Suggested website image gallery
 
-![Cover](assets/01_cover.png)
+![Cover](assets/01_cover.svg)
 
-![Data pipeline](assets/02_data_pipeline.png)
+![Data pipeline](assets/02_data_pipeline.svg)
 
-![Data/model view](assets/03_data_or_model.png)
+![Data/model view](assets/03_data_or_model.svg)
 
-![Evaluation/results view](assets/04_evaluation_or_results.png)
+![Evaluation/results view](assets/04_evaluation_or_results.svg)
 
 ### Suggested portfolio copy
-This project demonstrates classification, probability calibration, ROC-AUC, Brier score using a reproducible workflow with explicit data provenance, processing, evaluation, limitations, and research documentation. The repository includes executable code and a scientific-style technical report suitable for supervisor review.
+This project demonstrates probabilistic classification, feature standardization, ROC-AUC, accuracy, and Brier-score evaluation using a reproducible workflow with explicit data provenance and real empirical results. The central research lesson is that strong class discrimination does not automatically guarantee reliable probabilities.
