@@ -1,21 +1,33 @@
 \documentclass[11pt]{article}
 \usepackage[margin=1in]{geometry}
 \usepackage{hyperref}
-\title{02. Classification + Calibration}
+\title{Classification and Probability Calibration}
 \author{Devis W. Saputra}
 \begin{document}
 \maketitle
+
 \begin{abstract}
-This manuscript source accompanies the reproducible GitHub technical report. Numerical findings should be regenerated from the repository before academic use.
+I use logistic regression on the Wisconsin Diagnostic Breast Cancer dataset to compare classification performance with probability quality. The recorded hold-out results are 0.9860 accuracy, 0.9977 ROC-AUC, and a 0.0181 Brier score.
 \end{abstract}
-\section{Research Objective}
-See the repository README and \texttt{paper/paper.md} for the full research question and rationale.
+
+\section{Question}
+Can a simple probabilistic classifier separate the two classes well while also producing useful probability estimates?
+
 \section{Data and Method}
-The dataset provenance, processing steps, executable method, validation design, and limitations are documented in the repository.
-\section{Reproducibility}
-Install \texttt{requirements.txt} and execute \texttt{python src/run\_experiment.py}.
+The dataset contains 569 observations and 30 numerical features. I use a stratified 75/25 train-test split. Features are standardized inside a scikit-learn pipeline before fitting logistic regression.
+
+\section{Evaluation}
+I report accuracy and ROC-AUC for classification performance and Brier score for probability quality. The repository also generates a calibration curve.
+
+\section{Results}
+The recorded run produced 0.9860 accuracy, 0.9977 ROC-AUC, and a Brier score of 0.0181.
+
 \section{Limitations}
-This is a portfolio research artifact rather than a peer-reviewed publication. External validation and stronger comparative experiments are required for publication claims.
+This is one hold-out split on a small benchmark dataset. A stronger study would use repeated validation, confidence intervals, and explicit calibration methods.
+
+\section{Reproduction}
+Install \texttt{requirements.txt} and run \texttt{python src/run\_experiment.py} from the repository root.
+
 \bibliographystyle{plain}
 \bibliography{references}
 \end{document}
