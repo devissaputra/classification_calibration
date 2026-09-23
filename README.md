@@ -93,10 +93,10 @@ ETHICS.md               deployment limits
 REPRODUCIBILITY.md      exact rerun procedure
 ```
 
-## Limits
+## How I read the result
 
-This is a compact benchmark, not a clinical model. Calibration quality can change across institutions, devices, prevalence levels, and time. ECE also depends on binning choices. A deployment study would require external validation, subgroup checks, uncertainty analysis, and clinical governance.
+The interesting part is that calibration is not automatically beneficial. The uncalibrated logistic model is already very strong on this split. Isotonic calibration slightly improves Brier score and log loss, while the binned ECE estimate changes very little. With only 143 test cases, those differences are small enough that I would want repeated splits before drawing a stronger conclusion.
 
-## Responsible use
+## Deployment caveat
 
-The dataset is medical, but this repository is an engineering and evaluation exercise. It must not be used for diagnosis or treatment decisions. See [ETHICS.md](ETHICS.md).
+This is a probability-calibration benchmark, not a clinical model. Calibration can shift across hospitals, devices, prevalence levels, and time. A real deployment study would need external validation, subgroup analysis, uncertainty estimates, and clinical governance. The repository must not be used for diagnosis or treatment decisions; see [ETHICS.md](ETHICS.md).
