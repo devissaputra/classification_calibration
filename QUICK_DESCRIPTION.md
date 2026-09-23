@@ -1,7 +1,6 @@
 # Quick Description
 
-Build a probabilistic classifier and evaluate discrimination as well as probability calibration.
+I use logistic regression on the Wisconsin Diagnostic Breast Cancer dataset to compare ordinary classification performance with probability quality. The project reports accuracy and ROC-AUC, then checks the predicted probabilities with the Brier score and a calibration curve.
 
-**Difficulty:** ★★★  
-**Dataset:** Wisconsin Diagnostic Breast Cancer dataset  
-**Core skills:** classification, probability calibration, ROC-AUC, Brier score
+**Dataset:** Wisconsin Diagnostic Breast Cancer  
+**Main ideas:** logistic regression, probability calibration, ROC-AUC, Brier score
