@@ -1,21 +1,19 @@
-# Web Portfolio Card
+# Portfolio Summary
 
-## Classification + Calibration
+## Classification and Probability Calibration
 
-**Track:** AI Engineering  
-**Difficulty:** ★★★  
-**Dataset:** Wisconsin Diagnostic Breast Cancer dataset  
-**Quick description:** Build a probabilistic classifier and evaluate discrimination as well as probability calibration.
+I built this project to separate two questions that are often mixed together: can a classifier rank cases correctly, and can its probabilities be trusted?
 
-### Suggested website image gallery
+The model is logistic regression on the Wisconsin Diagnostic Breast Cancer dataset. I evaluate accuracy, ROC-AUC, Brier score, and calibration behaviour on a held-out test set.
 
-![Cover](assets/01_cover.svg)
+### Images
 
-![Data pipeline](assets/02_data_pipeline.svg)
+![Project overview](assets/01_cover.svg)
 
-![Data/model view](assets/03_data_or_model.svg)
+![Processing pipeline](assets/02_data_pipeline.svg)
 
-![Evaluation/results view](assets/04_evaluation_or_results.svg)
+![Probability view](assets/03_data_or_model.svg)
 
-### Suggested portfolio copy
-This project demonstrates probabilistic classification, feature standardization, ROC-AUC, accuracy, and Brier-score evaluation using a reproducible workflow with explicit data provenance and real empirical results. The central research lesson is that strong class discrimination does not automatically guarantee reliable probabilities.
+![Evaluation summary](assets/04_evaluation_or_results.svg)
+
+**Key result:** 0.9977 ROC-AUC with a Brier score of 0.0181 on the recorded split.
