@@ -1,50 +1,53 @@
-# Classification + Calibration: Scientific-Style Technical Report
+# Classification and Probability Calibration
 
-**Status:** reproducible portfolio report, not peer reviewed.  
-**Difficulty:** ★★★  
-**Dataset:** Wisconsin Diagnostic Breast Cancer dataset
+## Question
 
-## Abstract
-This project studies a concrete AI Engineering problem using a real public dataset and a fully inspectable pipeline. The project focuses on classification, probability calibration, ROC-AUC, Brier score. Its central engineering goal is to make data preparation, model fitting, evaluation, and limitations reproducible rather than treating the model as a black box.
+Can a simple probabilistic classifier both separate the two classes well and produce useful probabilities?
 
-## 1. Research objective
-Build a probabilistic classifier and evaluate discrimination as well as probability calibration.
+## Data
 
-## 2. Data
-The dataset is **Wisconsin Diagnostic Breast Cancer dataset**. Provenance and the original reference are documented in [`DATA.md`](../DATA.md).
+I use the Wisconsin Diagnostic Breast Cancer dataset from scikit-learn. It contains 569 observations and 30 numerical features.
 
-## 3. Method
-The implemented pipeline is:
-1. Load real data
-2. Scale features
-3. Logistic regression
-4. Probability output
-5. Calibration audit
+I split the data into 75% training and 25% test data with stratification and `random_state=42`.
 
-## 4. Evaluation
-**Primary metric(s):** ROC-AUC / Brier.  
-**Validation design:** stratified hold-out.  
-The experiment saves machine-readable metrics and visual diagnostics so claims can be traced to an executable run.
+## Method
 
-## 5. Results
-Generated metrics:
-```json
-{
-  "accuracy": 0.986013986013986,
-  "roc_auc": 0.9976939203354298,
-  "brier": 0.01806692891806697,
-  "n": 569
-}
+The model is logistic regression inside a scikit-learn pipeline:
+
+1. standardize the features;
+2. fit logistic regression;
+3. predict probabilities on the held-out set;
+4. convert probabilities to classes at a 0.5 threshold.
+
+I evaluate accuracy and ROC-AUC for classification performance, then use the Brier score and a calibration curve to look at probability quality.
+
+## Results
+
+The recorded run produced:
+
+| Metric | Result |
+|---|---:|
+| Accuracy | 0.9860 |
+| ROC-AUC | 0.9977 |
+| Brier score | 0.0181 |
+
+## Interpretation
+
+The classifier separates the classes very well on this split. The Brier score is also low, but a single hold-out split is not enough to say that the probabilities will remain well calibrated on new data.
+
+## Limitations
+
+The dataset is small and the experiment uses one split. The calibration curve also depends on how probability bins are chosen.
+
+A stronger version would repeat the evaluation across several splits, report confidence intervals, and compare the uncalibrated model with Platt scaling and isotonic regression.
+
+## Reproduce
+
+From the repository root:
+
+```bash
+pip install -r requirements.txt
+python src/run_experiment.py
 ```
 
-## 6. Limitations and validity
-Key concern: threshold and calibration sensitivity. Benchmark performance on one dataset does not imply universal performance. The project is intended to demonstrate research engineering discipline and to provide a base for stronger comparative studies.
-
-## 7. Reproducibility
-Run `python src/run_experiment.py` from the repository root after installing `requirements.txt`.
-
-## 8. Next research extension
-Add repeated cross-validation or temporal/external validation, stronger baselines, hyperparameter sensitivity, confidence intervals, and a domain-specific error analysis.
-
-## References
-- Dataset/reference page: https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html
+The script writes the numerical results to `results/metrics.json`.
