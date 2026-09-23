@@ -34,6 +34,8 @@ All three variants use the same standardized logistic-regression base model:
 2. **Sigmoid** calibration using cross-validated Platt-style scaling
 3. **Isotonic** calibration using cross-validated isotonic regression
 
+![Calibration strategies](assets/03_data_or_model.svg)
+
 I report discrimination and probability-quality metrics together:
 
 - **ROC-AUC** for ranking quality
@@ -52,6 +54,8 @@ I report discrimination and probability-quality metrics together:
 
 The result is intentionally not framed as “calibration always helps.” On this split, logistic regression is already strong. Isotonic calibration slightly improves Brier score and log loss, while the simple binned ECE estimate does not improve. With only 143 test cases, small differences should not be overinterpreted.
 
+![Held-out calibration evaluation](assets/04_evaluation_or_results.svg)
+
 Generated metrics live in [results/metrics.json](results/metrics.json).
 
 ## Run
@@ -69,7 +73,7 @@ Windows activation:
 .venv\Scripts\activate
 ```
 
-Generated plots are written to `results/figures/`; the curated SVGs in `assets/` remain stable portfolio graphics.
+Generated plots are written to `results/figures/`; the explanatory graphics in `assets/` stay fixed while experiment-generated plots are written separately.
 
 ## Test
 
