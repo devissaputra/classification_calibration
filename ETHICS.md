@@ -1,5 +1,7 @@
-# Ethics and Responsible Use
+# Ethics and Limits
 
-This project is a research and learning artifact. Its models are not intended for autonomous high-stakes decisions.
+This project uses a medical benchmark dataset, but it is only a machine-learning exercise.
 
-For human-related datasets, predictions should be treated as decision support, not labels of a person's ability or worth. Validate subgroup performance, document missingness and measurement bias, preserve privacy, and keep a human reviewer in the loop. For non-human datasets, document domain limits and avoid presenting benchmark performance as universal model quality.
+The model should not be used to diagnose patients or make treatment decisions. The dataset is small, the experiment uses one hold-out split, and performance on this benchmark says nothing about deployment across hospitals, devices, or patient populations.
+
+If this kind of model were used in a real clinical setting, it would need external validation, subgroup analysis, calibration checks, documentation of measurement differences, and clinical oversight.
