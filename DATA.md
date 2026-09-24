@@ -10,3 +10,5 @@ This project uses scikit-learn's Wisconsin Diagnostic Breast Cancer dataset.
 Source documentation: https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html
 
 The repository does not bundle a modified copy of the dataset. The experiment loads it directly through scikit-learn each time it runs.
+
+Target encoding: 0 = malignant; 1 = benign. The reported positive-class probability is for benign. The dataset bundled with scikit-learn is used offline after installation.

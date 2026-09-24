@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import platform
+import sklearn
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -28,10 +30,14 @@ def expected_calibration_error(y_true, probabilities, n_bins: int = 10) -> float
     """Return a simple equal-width expected calibration error."""
     y = np.asarray(y_true)
     p = np.asarray(probabilities, dtype=float)
-    if y.shape[0] != p.shape[0]:
-        raise ValueError("y_true and probabilities must have the same length")
-    if np.any((p < 0) | (p > 1)):
-        raise ValueError("probabilities must lie in [0, 1]")
+    if y.ndim != 1 or p.ndim != 1 or y.shape != p.shape or y.size == 0:
+        raise ValueError("Expected nonempty, equal-length one-dimensional arrays")
+    if not np.isin(y, [0, 1]).all():
+        raise ValueError("y_true must contain binary labels 0 or 1")
+    if not np.isfinite(p).all() or np.any((p < 0) | (p > 1)):
+        raise ValueError("probabilities must be finite and lie in [0, 1]")
+    if isinstance(n_bins, bool) or not isinstance(n_bins, (int, np.integer)) or n_bins < 1:
+        raise ValueError("n_bins must be a positive integer")
 
     edges = np.linspace(0.0, 1.0, n_bins + 1)
     bin_ids = np.digitize(p, edges[1:-1], right=True)
@@ -79,11 +85,13 @@ def build_models(seed: int = SEED):
             estimator=clone(base),
             method="sigmoid",
             cv=5,
+            ensemble=True,
         ),
         "isotonic": CalibratedClassifierCV(
             estimator=clone(base),
             method="isotonic",
             cv=5,
+            ensemble=True,
         ),
     }
 
@@ -106,7 +114,11 @@ def run_experiment(
     make_plots: bool = True,
 ):
     X_train, X_test, y_train, y_test, n_samples = load_split(seed)
-    results = {"n_samples": int(n_samples), "seed": int(seed), "models": {}}
+    results = {"n_samples": int(n_samples), "seed": int(seed), "models": {},
+               "positive_class": "benign (1)", "n_train": len(X_train),
+               "n_test": len(X_test), "calibration_ensemble": True,
+               "environment": {"python": platform.python_version(),
+                               "numpy": np.__version__, "scikit_learn": sklearn.__version__}}
     probabilities = {}
 
     for name, model in build_models(seed).items():
@@ -135,8 +147,8 @@ def run_experiment(
             )
             plt.plot(predicted, observed, marker="o", label=name)
         plt.plot([0, 1], [0, 1], linestyle="--", label="ideal")
-        plt.xlabel("Mean predicted probability")
-        plt.ylabel("Observed fraction")
+        plt.xlabel("Mean predicted probability of benign class")
+        plt.ylabel("Observed benign fraction")
         plt.title("Probability calibration")
         plt.legend()
         plt.tight_layout()

@@ -23,5 +23,14 @@
       "log_loss": 0.0657169994887572,
       "ece_10": 0.034495711441332455
     }
+  },
+  "positive_class": "benign (1)",
+  "n_train": 426,
+  "n_test": 143,
+  "calibration_ensemble": true,
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "scikit_learn": "1.8.0"
   }
 }

@@ -34,7 +34,7 @@ Outputs:
 
 ```bash
 pip install pytest
-pytest
+python -m pytest
 ```
 
 GitHub Actions runs the same tests on pushes and pull requests.
@@ -42,3 +42,7 @@ GitHub Actions runs the same tests on pushes and pull requests.
 ## Numerical reproducibility
 
 The seed fixes the data split and model randomness where applicable. Exact floating-point values can still move slightly as NumPy or scikit-learn change. The README therefore treats the committed metrics as a recorded run, not a universal constant.
+
+## Probability and calibration conventions
+
+Class 0 is malignant and class 1 is benign. Reported probabilities and ROC curves use benign as the positive class. ECE uses 10 equal-width bins; the reliability plot uses 8. The calibrated models average five fitted classifier/calibrator pairs, while the uncalibrated model uses the full training split. This comparison therefore includes ensembling effects as well as calibration.

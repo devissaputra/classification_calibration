@@ -46,3 +46,17 @@ def test_experiment_returns_valid_probability_metrics(tmp_path):
         assert 0.0 <= metrics["ece_10"] <= 1.0
 
     assert (tmp_path / "metrics.json").exists()
+
+
+def test_ece_rejects_invalid_inputs():
+    import pytest
+    for y, p, bins in [([], [], 10), ([0], [np.nan], 10), ([0], [np.inf], 10),
+                       ([2], [.5], 10), ([0], [.5], 0), ([0], [.5], 2.5),
+                       ([[0]], [[.5]], 10), ([0, 1], [.5], 10)]:
+        with pytest.raises(ValueError):
+            expected_calibration_error(y, p, bins)
+
+
+def test_ece_known_weighted_error_and_boundaries():
+    assert np.isclose(expected_calibration_error([0, 1], [.25, .75], 2), .25)
+    assert expected_calibration_error([0, 1], [0., 1.], 10) == 0

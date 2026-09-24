@@ -24,4 +24,6 @@ The experiment demonstrates why discrimination and calibration should be evaluat
 
 ## Limitations
 
-This is a small benchmark study with one external hold-out split and no external clinical validation. It is not evidence for diagnostic use.
+This is a small benchmark study with one internal hold-out split and no external clinical validation. It is not evidence for diagnostic use.
+
+The positive class is benign (1). Calibrated predictions average five classifier/calibrator pairs, so the comparison includes ensemble effects. This is a technical demonstration report, not a peer-reviewed publication.

@@ -4,6 +4,8 @@
 
 
 **Category:** AI Engineering
+
+**Status:** Reproducible benchmark demonstration.
 ![Project overview](assets/01_cover.svg)
 
 A reproducible comparison of **uncalibrated logistic regression, sigmoid calibration, and isotonic calibration** on the Wisconsin Diagnostic Breast Cancer benchmark.
@@ -81,7 +83,7 @@ Generated plots are written to `results/figures/`; the explanatory graphics in `
 
 ```bash
 pip install pytest
-pytest
+python -m pytest
 ```
 
 The tests check both repository structure and experiment behaviour, including the calibration-error implementation and metric output.
@@ -106,3 +108,7 @@ The interesting part is that calibration is not automatically beneficial. The un
 ## Deployment caveat
 
 This is a probability-calibration benchmark, not a clinical model. Calibration can shift across hospitals, devices, prevalence levels, and time. A real deployment study would need external validation, subgroup analysis, uncertainty estimates, and clinical governance. The repository must not be used for diagnosis or treatment decisions; see [ETHICS.md](ETHICS.md).
+
+## Probability and calibration conventions
+
+Class 0 is malignant and class 1 is benign. Reported probabilities and ROC curves use benign as the positive class. ECE uses 10 equal-width bins; the reliability plot uses 8. The calibrated models average five fitted classifier/calibrator pairs, while the uncalibrated model uses the full training split. This comparison therefore includes ensembling effects as well as calibration.

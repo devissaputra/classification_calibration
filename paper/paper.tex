@@ -11,8 +11,11 @@
 This experiment compares uncalibrated logistic regression with cross-validated sigmoid and isotonic probability calibration on the Wisconsin Diagnostic Breast Cancer benchmark. The held-out test set is not used for fitting or calibration. Evaluation combines discrimination and probability-quality metrics.
 \end{abstract}
 
+\noindent Technical demonstration report; not a peer-reviewed publication.
 \section{Method}
 The dataset contains 569 observations and 30 numerical features. A stratified 75/25 train/test split with random seed 42 is used. Sigmoid and isotonic calibration are learned with five-fold cross-validation inside the training data.
+
+The positive class is benign (1). Calibrated variants average five classifier/calibrator pairs; this includes ensemble effects.
 
 \section{Results}
 \begin{tabular}{lrrrrr}
