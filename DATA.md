@@ -1,43 +1,38 @@
-# Dataset Card — UCI Bank Marketing
+# Dataset Card: UCI Bank Marketing
 
-## Canonical source
+## Source
 
-UCI Machine Learning Repository, dataset 222: **Bank Marketing**  
+UCI Machine Learning Repository, dataset 222: Bank Marketing  
 DOI: https://doi.org/10.24432/C5K306  
 Dataset page: https://archive.ics.uci.edu/dataset/222/bank+marketing  
-Canonical archive: https://archive.ics.uci.edu/static/public/222/bank+marketing.zip  
-License reported by UCI: **CC BY 4.0**.
+License reported by UCI: CC BY 4.0.
 
-## File used
+UCI describes the dataset as direct-marketing campaign data from a Portuguese banking institution, with the binary goal of predicting whether a client subscribed to a term deposit. The repository records the sample and feature counts returned by the loader at run time rather than hard-coding them as experimental evidence.
 
-The experiment uses \`bank-full.csv\`, the full 45,211-row version of the older 16-predictor Bank Marketing schema. The CSV contains 16 predictors plus the binary target \`y\`.
+## Study role
 
-The runner records a SHA-256 hash of the exact CSV used in \`results/metrics.json\`, allowing a reviewer to verify that two runs used identical source bytes.
+This is the real external dataset used by the empirical pipeline. No source data are committed to this repository.
 
 ## Target
 
-\`y\` indicates whether the client subscribed to a term deposit. The runner maps \`yes\` to 1 and \`no\` to 0.
+The target is subscription to a term deposit. The runner maps yes to 1 and no to 0 and rejects unexpected target labels.
 
-## Predictors
+## Predictors and preprocessing
 
-The schema mixes numeric and categorical campaign/client attributes. Categorical variables are one-hot encoded and numeric variables are median-imputed and standardized. All preprocessing lives inside the estimator pipeline and is fitted on training data only.
+Numerical variables are median-imputed and standardized. Categorical variables are mode-imputed and one-hot encoded with unknown-category tolerance. Preprocessing lives inside the estimator pipeline and is fitted on training data only.
 
-## Special values
+## Split discipline
 
-The dataset contains categorical values such as \`unknown\`. The study preserves them as observed categories rather than silently assigning a substantive interpretation.
+The primary study uses a fixed stratified 80/20 holdout with seed 42. Calibrators are learned only inside the training partition through cross-validation. The untouched primary test partition is used only for final evaluation.
 
-## Operational caveat: duration
+## Operational feature caveat
 
-\`duration\` records the last contact duration. It can be predictive retrospectively, but it is not available before the call has occurred. The full-feature model is therefore paired with an explicit no-\`duration\` ablation so predictive performance is not confused with pre-contact deployability.
+The duration variable, when present, is known only after a call occurs. The full protocol therefore repeats the primary experiment after removing duration. This ablation is required for an honest operational interpretation.
 
-## Split protocol
+## Provenance fingerprint
 
-The primary empirical protocol uses a fixed stratified 80/20 holdout split with seed 42. Robustness is examined with four additional fixed seeds: 13, 29, 73 and 101. Calibrators are learned entirely inside each training partition through cross-validation. Test partitions are not used for preprocessing, model fitting or calibrator fitting.
+The full runner stores a SHA-256 fingerprint derived from the loaded dataframe content and row order. This is a reproducibility fingerprint of the loaded data representation, not a claim about the raw archive byte hash.
 
-## Governance
+## Limitations
 
-Raw UCI data are not committed to this repository. The runner downloads the canonical archive and caches the extracted CSV under \`data/cache/\`, which is gitignored. Users must preserve UCI attribution and comply with CC BY 4.0.
-
-## Known limitations
-
-The data are historical and come from one institutional and campaign context. They should not be treated as representative of present-day banking populations, channels, policy environments or customer behavior.
+This is historical data from one institutional setting. Results should not be interpreted as representative of current banking populations, channels, regulations, or deployment environments.
