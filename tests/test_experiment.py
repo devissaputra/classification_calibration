@@ -1,4 +1,5 @@
 from pathlib import Path
+import hashlib
 import io
 import zipfile
 
@@ -13,6 +14,7 @@ from src.run_experiment import (
     expected_calibration_error,
     normalize_target,
     paired_seed_differences,
+    validate_dataset_hash,
 )
 
 
@@ -113,3 +115,11 @@ def test_paired_seed_differences_are_descriptive():
     assert set(result) == {"logistic_sigmoid", "logistic_isotonic"}
     assert result["logistic_sigmoid"]["brier"]["mean_delta"] < 0
     assert "bootstrap_95_ci_of_mean_delta" in result["logistic_sigmoid"]["brier"]
+
+
+def test_frozen_dataset_hash_guard():
+    payload = b"research-bundle-fixture"
+    expected = hashlib.sha256(payload).hexdigest()
+    assert validate_dataset_hash(payload, expected) == expected
+    with pytest.raises(ValueError, match="Unexpected bank-full.csv SHA-256"):
+        validate_dataset_hash(payload, "0" * 64)
