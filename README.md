@@ -1,95 +1,104 @@
-# Probability Calibration Research Bundle
+# Probability Calibration Under Class Imbalance
 
 [![CI](https://github.com/devissaputra/classification_calibration/actions/workflows/ci.yml/badge.svg)](https://github.com/devissaputra/classification_calibration/actions/workflows/ci.yml)
+[![Empirical Study](https://github.com/devissaputra/classification_calibration/actions/workflows/empirical.yml/badge.svg)](https://github.com/devissaputra/classification_calibration/actions/workflows/empirical.yml)
 
 **Research Bundle · AI Engineering · empirical probability calibration**
 
-This repository is a professor-facing, reproducible empirical study of probability calibration under class imbalance. The default experiment uses the **UCI Bank Marketing** dataset rather than a packaged toy benchmark.
+This repository is a reproducible empirical study of probability calibration under class imbalance using the **UCI Bank Marketing** dataset. The study separates ranking quality from probability quality and tests whether apparent calibration gains remain stable across repeated train/test splits, calibration choices, ECE binning choices, and an operational feature ablation.
 
 ## Research question
 
-> When a logistic classifier predicts subscription to a bank term deposit, how do uncalibrated, sigmoid-calibrated, and isotonic-calibrated probabilities differ in discrimination and probability quality on an untouched holdout set?
+> How do uncalibrated and calibrated logistic probabilities differ in discrimination and probability quality on UCI Bank Marketing, and how stable are those differences under repeated splits and realistic sensitivity checks?
 
-The study intentionally separates ranking quality from probability quality. A model may have strong ROC-AUC and still produce probabilities that are poorly calibrated.
+A classifier can rank observations well while still producing probabilities that are systematically too high or too low. That distinction matters whenever predicted probabilities are interpreted as response likelihoods rather than only as ranking scores.
 
 ## Real dataset
 
-**UCI Bank Marketing (dataset 222)**, collected from direct-marketing campaigns of a Portuguese banking institution.
+**UCI Bank Marketing (dataset 222)** contains records from direct-marketing campaigns of a Portuguese banking institution. The full \`bank-full.csv\` version has 45,211 observations, 16 predictors and one binary target indicating whether a client subscribed to a term deposit. UCI reports a CC BY 4.0 license and DOI \`10.24432/C5K306\`.
 
-- source: UCI Machine Learning Repository
-- instances: 45,211 in the full bank dataset
-- mixed numerical and categorical predictors
-- binary target: term-deposit subscription
-- dataset license: CC BY 4.0
-- DOI: 10.24432/C5K306
+The runner downloads the canonical UCI archive when no local copy is supplied, extracts \`bank-full.csv\`, caches it outside version control, and records a SHA-256 hash of the exact CSV used. See [DATA.md](DATA.md).
 
-The dataset is fetched from UCI by the research runner through `ucimlrepo`. No copy of the source dataset is committed here. See [DATA.md](DATA.md).
+## Study design
 
-## Frozen study design
+### Primary conditions
 
-1. Fetch the UCI dataset and record source metadata.
-2. Normalize the binary target to `yes=1`, `no=0`.
-3. Create a fixed, stratified 80/20 train/test split with seed 42.
-4. Fit preprocessing **only on training data**.
-5. Compare the same logistic-regression base learner in three conditions:
-   - uncalibrated;
-   - sigmoid calibration with five-fold cross-validation inside training data;
-   - isotonic calibration with five-fold cross-validation inside training data.
-6. Evaluate once on the untouched test set.
-7. Report ROC-AUC, Brier score, log loss, ECE-10, and accuracy.
-8. Preserve environment and dataset metadata in the result JSON.
+1. \`dummy_prior\` — class-prior probability baseline.
+2. \`logistic_uncalibrated\` — leakage-aware mixed-type preprocessing plus logistic regression.
+3. \`logistic_sigmoid\` — the same logistic learner with five-fold sigmoid calibration inside training data.
+4. \`logistic_isotonic\` — the same logistic learner with five-fold isotonic calibration inside training data.
 
-No empirical winner is asserted in this README before the real-data experiment is run.
+### Evaluation
 
-## Run the empirical study
+- fixed primary split: seed 42;
+- repeated stratified 80/20 holdouts: seeds 13, 29, 42, 73 and 101;
+- ROC-AUC and average precision for ranking;
+- Brier score, log loss and ECE-10 for probability quality;
+- accuracy at a 0.5 threshold as a secondary descriptive metric;
+- paired split-level deltas against uncalibrated logistic regression;
+- descriptive bootstrap intervals over paired split-level deltas, with **no p-value claim** because repeated holdouts are not independent.
 
-```bash
+### Sensitivity and ablation
+
+- calibration CV sensitivity: 3, 5 and 10 folds;
+- ECE bin sensitivity: 5, 10 and 20 equal-width bins;
+- operational ablation: rerun without \`duration\`, because call duration is not known before a marketing call is completed;
+- primary-split error analysis including FP, FN and high-confidence errors.
+
+## Run the study
+
+\`\`\`bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python src/run_experiment.py
-```
+PYTHONPATH=. pytest -q
+PYTHONPATH=. python src/run_experiment.py
+\`\`\`
 
-The runner writes `results/metrics.json` and, when plotting is enabled, calibration and ROC figures under `results/figures/`.
+For a faster networked empirical run:
 
-## Why this is a Research Bundle
+\`\`\`bash
+PYTHONPATH=. python src/run_experiment.py --quick
+\`\`\`
 
-The repository includes:
+The full runner writes:
 
-- an explicit empirical question;
-- real external data with provenance and license;
-- a frozen split/evaluation protocol;
-- leakage-aware preprocessing;
-- meaningful probabilistic baselines;
-- machine-readable results;
-- tests and CI;
-- reproducibility documentation;
-- ethics and deployment boundaries;
-- a paper scaffold and software citation.
+\`\`\`text
+results/metrics.json
+results/repeated_runs.csv
+results/summary.md
+results/figures/calibration_curve.png
+results/figures/roc_curve.png
+results/figures/precision_recall_curve.png
+paper/results.md
+\`\`\`
+
+The GitHub \`Empirical Study\` workflow reruns the full study after material changes to the runner and commits regenerated result artifacts. Numerical results should therefore come from the executable protocol rather than hand-edited prose.
+
+## Research-bundle evidence
+
+This repository includes a falsifiable empirical question, canonical real-data provenance and checksum capture, leakage-aware preprocessing, explicit baselines, repeated holdout evaluation, calibration-method sensitivity, ECE-bin sensitivity, an operational feature ablation, error analysis, machine-readable outputs, offline CI, a separate empirical workflow, and reproducibility/ethics documentation.
 
 See [RESEARCH_BUNDLE.md](RESEARCH_BUNDLE.md) for the evidence contract.
 
 ## Interpretation boundary
 
-This is a methodology study, **not a banking decision system**. The target is a historical marketing response, not customer value or eligibility. Calibration quality can change across time, campaigns, populations and acquisition channels. The study does not justify targeting, exclusion, credit decisions, or other consequential treatment of individuals.
+This is a methodology study, **not a banking decision system**. The target is historical marketing response. Results do not justify credit decisions, customer exclusion, eligibility decisions or automated targeting. Calibration can shift across time, institutions, populations and acquisition channels.
 
-## Repository map
+## Professor review path
 
-```text
-README.md                 research question and study overview
-RESEARCH_BUNDLE.md        bundle evidence contract
-DATA.md                   dataset card and provenance
-REPRODUCIBILITY.md        rerun protocol
-ETHICS.md                 responsible-use boundary
-src/run_experiment.py     real-data empirical runner
-tests/                    offline behavioural tests
-results/                  generated empirical outputs
-paper/                    paper-ready study scaffold
-CITATION.cff              software citation
-```
+1. [README.md](README.md)
+2. [DATA.md](DATA.md)
+3. [src/run_experiment.py](src/run_experiment.py)
+4. [results/summary.md](results/summary.md)
+5. [results/metrics.json](results/metrics.json)
+6. [REPRODUCIBILITY.md](REPRODUCIBILITY.md)
+7. [ETHICS.md](ETHICS.md)
+8. [paper/paper.md](paper/paper.md)
+9. [paper/results.md](paper/results.md)
 
 ## Citation
 
-Dataset: Moro, S., Rita, P., & Cortez, P. (2014). Bank Marketing. UCI Machine Learning Repository. https://doi.org/10.24432/C5K306
+Moro, S., Rita, P., & Cortez, P. (2014). *Bank Marketing* [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5K306
 
-Code and study design: see [CITATION.cff](CITATION.cff).
+Repository citation metadata is in [CITATION.cff](CITATION.cff).
