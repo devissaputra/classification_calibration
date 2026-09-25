@@ -1,68 +1,47 @@
-# Classification and Probability Calibration
+# Probability Calibration Research Bundle
 
 [![CI](https://github.com/devissaputra/classification_calibration/actions/workflows/ci.yml/badge.svg)](https://github.com/devissaputra/classification_calibration/actions/workflows/ci.yml)
 
+**Research Bundle · AI Engineering · empirical probability calibration**
 
-**Category:** AI Engineering
+This repository is a professor-facing, reproducible empirical study of probability calibration under class imbalance. The default experiment uses the **UCI Bank Marketing** dataset rather than a packaged toy benchmark.
 
-**Status:** Reproducible benchmark demonstration.
-![Project overview](assets/01_cover.svg)
+## Research question
 
-A reproducible comparison of **uncalibrated logistic regression, sigmoid calibration, and isotonic calibration** on the Wisconsin Diagnostic Breast Cancer benchmark.
+> When a logistic classifier predicts subscription to a bank term deposit, how do uncalibrated, sigmoid-calibrated, and isotonic-calibrated probabilities differ in discrimination and probability quality on an untouched holdout set?
 
-## Question
+The study intentionally separates ranking quality from probability quality. A model may have strong ROC-AUC and still produce probabilities that are poorly calibrated.
 
-A classifier can rank cases correctly while still producing probabilities that are too confident or too cautious. This project asks:
+## Real dataset
 
-> Does post-hoc calibration improve the quality of logistic-regression probabilities on a held-out test set?
+**UCI Bank Marketing (dataset 222)**, collected from direct-marketing campaigns of a Portuguese banking institution.
 
-The test set is untouched during fitting and calibration. Sigmoid and isotonic calibration are learned with five-fold cross-validation inside the training data.
+- source: UCI Machine Learning Repository
+- instances: 45,211 in the full bank dataset
+- mixed numerical and categorical predictors
+- binary target: term-deposit subscription
+- dataset license: CC BY 4.0
+- DOI: 10.24432/C5K306
 
-## Data
+The dataset is fetched from UCI by the research runner through `ucimlrepo`. No copy of the source dataset is committed here. See [DATA.md](DATA.md).
 
-- 569 observations
-- 30 numerical features
-- binary target
-- stratified 75/25 train/test split
-- fixed seed: 42
+## Frozen study design
 
-The dataset is loaded directly from scikit-learn. See [DATA.md](DATA.md) for provenance.
+1. Fetch the UCI dataset and record source metadata.
+2. Normalize the binary target to `yes=1`, `no=0`.
+3. Create a fixed, stratified 80/20 train/test split with seed 42.
+4. Fit preprocessing **only on training data**.
+5. Compare the same logistic-regression base learner in three conditions:
+   - uncalibrated;
+   - sigmoid calibration with five-fold cross-validation inside training data;
+   - isotonic calibration with five-fold cross-validation inside training data.
+6. Evaluate once on the untouched test set.
+7. Report ROC-AUC, Brier score, log loss, ECE-10, and accuracy.
+8. Preserve environment and dataset metadata in the result JSON.
 
-## Method
+No empirical winner is asserted in this README before the real-data experiment is run.
 
-![Processing pipeline](assets/02_data_pipeline.svg)
-
-All three variants use the same standardized logistic-regression base model:
-
-1. **Uncalibrated** logistic regression
-2. **Sigmoid** calibration using cross-validated Platt-style scaling
-3. **Isotonic** calibration using cross-validated isotonic regression
-
-![Calibration strategies](assets/03_data_or_model.svg)
-
-I report discrimination and probability-quality metrics together:
-
-- **ROC-AUC** for ranking quality
-- **Brier score** for squared probability error
-- **Log loss** for probabilistic fit
-- **ECE (10 bins)** as a simple calibration diagnostic
-- **Accuracy** at a 0.5 decision threshold
-
-## Recorded results
-
-| Model | Accuracy | ROC-AUC | Brier ↓ | Log loss ↓ | ECE-10 ↓ |
-|---|---:|---:|---:|---:|---:|
-| Uncalibrated | 0.9860 | 0.9977 | 0.0181 | 0.0679 | 0.0310 |
-| Sigmoid | 0.9790 | 0.9979 | 0.0273 | 0.1152 | 0.0769 |
-| Isotonic | 0.9720 | 0.9981 | **0.0179** | **0.0657** | 0.0345 |
-
-The result is intentionally not framed as “calibration always helps.” On this split, logistic regression is already strong. Isotonic calibration slightly improves Brier score and log loss, while the simple binned ECE estimate does not improve. With only 143 test cases, small differences should not be overinterpreted.
-
-![Held-out calibration evaluation](assets/04_evaluation_or_results.svg)
-
-Generated metrics live in [results/metrics.json](results/metrics.json).
-
-## Run
+## Run the empirical study
 
 ```bash
 python -m venv .venv
@@ -71,44 +50,46 @@ pip install -r requirements.txt
 python src/run_experiment.py
 ```
 
-Windows activation:
+The runner writes `results/metrics.json` and, when plotting is enabled, calibration and ROC figures under `results/figures/`.
 
-```powershell
-.venv\Scripts\activate
-```
+## Why this is a Research Bundle
 
-Generated plots are written to `results/figures/`; the explanatory graphics in `assets/` stay fixed while experiment-generated plots are written separately.
+The repository includes:
 
-## Test
+- an explicit empirical question;
+- real external data with provenance and license;
+- a frozen split/evaluation protocol;
+- leakage-aware preprocessing;
+- meaningful probabilistic baselines;
+- machine-readable results;
+- tests and CI;
+- reproducibility documentation;
+- ethics and deployment boundaries;
+- a paper scaffold and software citation.
 
-```bash
-pip install pytest
-python -m pytest
-```
+See [RESEARCH_BUNDLE.md](RESEARCH_BUNDLE.md) for the evidence contract.
 
-The tests check both repository structure and experiment behaviour, including the calibration-error implementation and metric output.
+## Interpretation boundary
+
+This is a methodology study, **not a banking decision system**. The target is a historical marketing response, not customer value or eligibility. Calibration quality can change across time, campaigns, populations and acquisition channels. The study does not justify targeting, exclusion, credit decisions, or other consequential treatment of individuals.
 
 ## Repository map
 
 ```text
-assets/                 curated explanatory graphics
-paper/                  technical write-up and LaTeX source
-results/metrics.json    recorded experiment output
-src/run_experiment.py   import-safe experiment module
-tests/                  behavioural and structure tests
-DATA.md                 dataset provenance
-ETHICS.md               deployment limits
-REPRODUCIBILITY.md      exact rerun procedure
+README.md                 research question and study overview
+RESEARCH_BUNDLE.md        bundle evidence contract
+DATA.md                   dataset card and provenance
+REPRODUCIBILITY.md        rerun protocol
+ETHICS.md                 responsible-use boundary
+src/run_experiment.py     real-data empirical runner
+tests/                    offline behavioural tests
+results/                  generated empirical outputs
+paper/                    paper-ready study scaffold
+CITATION.cff              software citation
 ```
 
-## How I read the result
+## Citation
 
-The interesting part is that calibration is not automatically beneficial. The uncalibrated logistic model is already very strong on this split. Isotonic calibration slightly improves Brier score and log loss, while the binned ECE estimate changes very little. With only 143 test cases, those differences are small enough that I would want repeated splits before drawing a stronger conclusion.
+Dataset: Moro, S., Rita, P., & Cortez, P. (2014). Bank Marketing. UCI Machine Learning Repository. https://doi.org/10.24432/C5K306
 
-## Deployment caveat
-
-This is a probability-calibration benchmark, not a clinical model. Calibration can shift across hospitals, devices, prevalence levels, and time. A real deployment study would need external validation, subgroup analysis, uncertainty estimates, and clinical governance. The repository must not be used for diagnosis or treatment decisions; see [ETHICS.md](ETHICS.md).
-
-## Probability and calibration conventions
-
-Class 0 is malignant and class 1 is benign. Reported probabilities and ROC curves use benign as the positive class. ECE uses 10 equal-width bins; the reliability plot uses 8. The calibrated models average five fitted classifier/calibrator pairs, while the uncalibrated model uses the full training split. This comparison therefore includes ensembling effects as well as calibration.
+Code and study design: see [CITATION.cff](CITATION.cff).

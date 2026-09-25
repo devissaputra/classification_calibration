@@ -1,1 +1,3 @@
-A reproducible probability-calibration study comparing uncalibrated logistic regression with cross-validated sigmoid and isotonic calibration. Reports ROC-AUC, Brier score, log loss, ECE, and accuracy on an untouched held-out test set.
+# Probability Calibration Research Bundle
+
+Empirical AI Engineering research bundle using the real UCI Bank Marketing dataset to compare uncalibrated logistic regression with sigmoid and isotonic post-hoc calibration. The study freezes a leakage-aware holdout protocol and evaluates discrimination together with Brier score, log loss and expected calibration error.

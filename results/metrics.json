@@ -1,36 +1,8 @@
 {
-  "n_samples": 569,
-  "seed": 42,
-  "models": {
-    "uncalibrated": {
-      "accuracy": 0.986013986013986,
-      "roc_auc": 0.9976939203354298,
-      "brier": 0.01806692891806697,
-      "log_loss": 0.06786889786254298,
-      "ece_10": 0.031003709682361047
-    },
-    "sigmoid": {
-      "accuracy": 0.9790209790209791,
-      "roc_auc": 0.9979035639412998,
-      "brier": 0.027288448996421542,
-      "log_loss": 0.11515802394024714,
-      "ece_10": 0.07689255804746604
-    },
-    "isotonic": {
-      "accuracy": 0.972027972027972,
-      "roc_auc": 0.9981132075471698,
-      "brier": 0.017947928209703604,
-      "log_loss": 0.0657169994887572,
-      "ece_10": 0.034495711441332455
-    }
-  },
-  "positive_class": "benign (1)",
-  "n_train": 426,
-  "n_test": 143,
-  "calibration_ensemble": true,
-  "environment": {
-    "python": "3.12.14",
-    "numpy": "2.3.5",
-    "scikit_learn": "1.8.0"
-  }
+  "research_bundle": true,
+  "status": "regenerate_required",
+  "message": "The previous packaged-benchmark metrics were intentionally removed. Run src/run_experiment.py against UCI Bank Marketing to generate valid empirical results.",
+  "dataset": "UCI Bank Marketing",
+  "uci_id": 222,
+  "doi": "10.24432/C5K306"
 }
