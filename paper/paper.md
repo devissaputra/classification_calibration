@@ -12,6 +12,10 @@ How do sigmoid and isotonic calibration alter logistic-regression probability qu
 
 The study uses UCI Bank Marketing, dataset 222, DOI 10.24432/C5K306, licensed CC BY 4.0. The runner extracts bank-full.csv from the official UCI archive and records the exact raw CSV SHA-256, sample count, predictor count, and positive-class prevalence.
 
+## Related work
+
+Probability calibration evaluates whether predicted probabilities correspond to observed frequencies rather than only whether a classifier ranks cases correctly. The protocol follows the established distinction between discrimination and probabilistic calibration, using the Brier score alongside log loss and calibration diagnostics. Sigmoid and isotonic post-hoc calibration are included as standard supervised calibration approaches; expected calibration error is treated as a bin-dependent descriptive metric rather than a universal scalar truth.
+
 ## Methods
 
 ### Preprocessing
@@ -40,7 +44,9 @@ For each primary model, the runner records confusion counts, overall error rate,
 
 ## Results
 
-Generated numerical results are written to paper/results.md and results/summary.md. The complete sensitivity, ablation, error-analysis, environment, and uncertainty records are stored in results/metrics.json. The manuscript intentionally avoids hand-entered performance values.
+Generated numerical results are written to paper/results.md, paper/results.tex, and results/summary.md. The complete sensitivity, ablation, error-analysis, environment, and uncertainty records are stored in results/metrics.json. The LaTeX manuscript imports its generated result section rather than duplicating numerical values by hand.
+
+Under the frozen current protocol, isotonic calibration improves probability-quality metrics more materially than sigmoid calibration while leaving ranking performance nearly unchanged. The duration-removal ablation also shows that retrospective performance is substantially stronger when the post-contact duration variable is available, reinforcing the need to separate methodological calibration findings from a pre-contact deployment claim.
 
 ## Validity and limitations
 

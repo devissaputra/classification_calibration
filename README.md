@@ -1,6 +1,7 @@
 # Probability Calibration Research Bundle
 
 [![CI](https://github.com/devissaputra/classification_calibration/actions/workflows/ci.yml/badge.svg)](https://github.com/devissaputra/classification_calibration/actions/workflows/ci.yml)
+[![Empirical Study](https://github.com/devissaputra/classification_calibration/actions/workflows/empirical.yml/badge.svg)](https://github.com/devissaputra/classification_calibration/actions/workflows/empirical.yml)
 
 **Research Bundle · AI Engineering · empirical probability calibration**
 
@@ -20,7 +21,7 @@ How do sigmoid and isotonic calibration change the probability quality and discr
 - DOI: 10.24432/C5K306
 - license reported by UCI: CC BY 4.0
 - official archive: downloaded directly by the runner
-- provenance: the exact raw CSV SHA-256 is recorded in results/metrics.json
+- provenance: the exact raw CSV SHA-256 is recorded in results/metrics.json and enforced against the frozen expected hash before analysis
 
 No copy of the source dataset is committed. See DATA.md.
 
@@ -67,6 +68,7 @@ A successful full run produces:
 - results/figures/roc_curve.png
 - results/figures/precision_recall_curve.png
 - paper/results.md
+- paper/results.tex
 
 The JSON file contains the full calibration-fold sensitivity, ECE-bin sensitivity, duration ablation, error analysis, repeated-split summary, and paired-delta uncertainty results.
 
@@ -102,3 +104,8 @@ This is a methodology study, not a banking decision system. The dataset is histo
 Dataset: Moro, S., Rita, P., & Cortez, P. (2014). Bank Marketing. UCI Machine Learning Repository. https://doi.org/10.24432/C5K306
 
 Code and study design: see CITATION.cff.
+
+
+## Frozen data integrity
+
+The current protocol accepts only the validated `bank-full.csv` bytes with SHA-256 `d1513ec63b385506f7cfce9f2c5caa9fe99e7ba4e8c3fa264b3aaf0f849ed32d`. A same-shape but different file fails fast rather than silently producing a new empirical result. Changing the accepted source requires an explicit protocol revision.

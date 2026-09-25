@@ -1,3 +1,3 @@
 # Probability Calibration Research Bundle
 
-Empirical AI Engineering research bundle using the real UCI Bank Marketing dataset to compare uncalibrated logistic regression with sigmoid and isotonic post-hoc calibration. The study freezes a leakage-aware holdout protocol and evaluates discrimination together with Brier score, log loss and expected calibration error.
+Empirical AI Engineering research bundle on the real UCI Bank Marketing dataset. It compares uncalibrated logistic regression with sigmoid and isotonic calibration across five fixed stratified holdouts, calibration-fold and ECE-bin sensitivity checks, an operational duration-feature ablation, paired robustness summaries, error analysis, and generated research artifacts. The external dataset is frozen by an enforced SHA-256 identity check.

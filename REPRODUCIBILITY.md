@@ -13,6 +13,7 @@ Use Python 3.11 or newer.
 ## Frozen full-study defaults
 
 - dataset: UCI Bank Marketing, dataset 222
+- frozen bank-full.csv SHA-256: d1513ec63b385506f7cfce9f2c5caa9fe99e7ba4e8c3fa264b3aaf0f849ed32d
 - canonical file: bank-full.csv from the official UCI archive
 - primary seed: 42
 - repeated seeds: 13, 29, 42, 73, 101
@@ -36,12 +37,13 @@ A successful full run regenerates:
 - results/figures/roc_curve.png
 - results/figures/precision_recall_curve.png
 - paper/results.md
+- paper/results.tex
 
 The full sensitivity, ablation, uncertainty, error-analysis, and environment records are embedded in results/metrics.json.
 
 ## Data retrieval
 
-The runner downloads the official UCI archive directly and extracts bank-full.csv, then caches that CSV under data/cache. A local bank-full.csv can instead be supplied with the --data-path option. The raw CSV SHA-256 is recorded so the exact bytes used in a run can be checked later.
+The runner downloads the official UCI archive directly and extracts bank-full.csv, then caches that CSV under data/cache. A local bank-full.csv can instead be supplied with the --data-path option. In both cases the bytes must match the frozen expected SHA-256 before modeling begins; the recorded result manifest repeats the accepted hash for auditability.
 
 ## CI boundary
 

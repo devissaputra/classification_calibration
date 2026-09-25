@@ -11,7 +11,7 @@ Primary evidence: untouched primary holdout plus repeated-split and sensitivity 
 
 A full run must record and generate:
 
-1. Dataset identity, DOI, license, sample count, feature count, target prevalence, source location, and SHA-256 of the exact loaded bank-full.csv bytes.
+1. Dataset identity, DOI, license, sample count, feature count, target prevalence, source location, and SHA-256 of the exact loaded bank-full.csv bytes; the hash must equal the frozen expected value before analysis proceeds.
 2. A fixed primary 80/20 stratified holdout using seed 42.
 3. A class-prior dummy baseline plus uncalibrated, sigmoid-calibrated, and isotonic-calibrated logistic regression.
 4. ROC-AUC, average precision, Brier score, log loss, ECE-10, and accuracy.
@@ -30,3 +30,8 @@ The bundle does not claim universal superiority of any calibration method, causa
 ## Professor review path
 
 Read README.md, DATA.md, src/run_experiment.py, tests/test_experiment.py, results/summary.md, paper/paper.md, REPRODUCIBILITY.md, and ETHICS.md in that order.
+
+
+## Frozen data identity
+
+The accepted `bank-full.csv` SHA-256 is `d1513ec63b385506f7cfce9f2c5caa9fe99e7ba4e8c3fa264b3aaf0f849ed32d`. A source change is treated as a protocol change, not as an invisible refresh.

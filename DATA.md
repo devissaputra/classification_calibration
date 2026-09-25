@@ -7,7 +7,13 @@ DOI: https://doi.org/10.24432/C5K306
 Dataset page: https://archive.ics.uci.edu/dataset/222/bank+marketing  
 License reported by UCI: CC BY 4.0.
 
-The runner retrieves the official UCI archive and extracts bank-full.csv. No raw dataset is committed to this repository.
+The runner retrieves the official UCI archive and extracts bank-full.csv. No raw dataset is committed to this repository. The frozen protocol validates the exact CSV bytes before analysis.
+
+## Frozen source identity
+
+Expected SHA-256 of `bank-full.csv`: `d1513ec63b385506f7cfce9f2c5caa9fe99e7ba4e8c3fa264b3aaf0f849ed32d`
+
+The runner fails if the loaded file does not match this value, even when row and column counts still look valid. A new upstream byte sequence must be reviewed and accepted as an explicit protocol revision rather than silently replacing the study data.
 
 ## Study role
 
