@@ -5,27 +5,27 @@
 Area: AI Engineering  
 Study: Probability calibration under class imbalance  
 Primary dataset: UCI Bank Marketing, dataset 222  
-Primary evidence: untouched holdout plus repeated-split and sensitivity analyses
+Primary evidence: untouched primary holdout plus repeated-split and sensitivity analyses
 
 ## Evidence required for a valid empirical run
 
 A full run must record and generate:
 
-1. UCI dataset identity, DOI, sample count, feature count, target prevalence, and a deterministic fingerprint of the loaded dataframe.
+1. Dataset identity, DOI, license, sample count, feature count, target prevalence, source location, and SHA-256 of the exact loaded bank-full.csv bytes.
 2. A fixed primary 80/20 stratified holdout using seed 42.
 3. A class-prior dummy baseline plus uncalibrated, sigmoid-calibrated, and isotonic-calibrated logistic regression.
-4. ROC-AUC, average precision, Brier score, log loss, ECE, and accuracy.
-5. Five repeated stratified holdouts using the frozen seed set.
-6. Paired split-level bootstrap intervals for calibrated-minus-uncalibrated metric deltas, reported descriptively rather than as significance tests.
-7. Calibration-fold sensitivity for 3, 5, and 10 folds.
-8. ECE-bin sensitivity for 5, 10, and 20 bins.
-9. An operational ablation that removes duration when that feature is present.
-10. Calibration-bin error analysis.
-11. Generated figures, machine-readable tables, environment versions, offline tests, and CI.
+4. ROC-AUC, average precision, Brier score, log loss, ECE-10, and accuracy.
+5. Five repeated stratified holdouts using seeds 13, 29, 42, 73, and 101.
+6. Descriptive paired split-level bootstrap intervals for calibrated-minus-uncalibrated metric deltas using 4,000 bootstrap resamples.
+7. Calibration-fold sensitivity at 3, 5, and 10 folds.
+8. ECE-bin sensitivity at 5, 10, and 20 bins.
+9. An operational ablation that removes duration.
+10. Primary-split confusion counts, error rate, and high-confidence error counts.
+11. Machine-readable results, split-level CSV output, generated figures, environment versions, offline tests, CI, and an empirical regeneration workflow.
 
 ## Non-claims
 
-The bundle does not claim universal superiority of any calibration method, causal effects, current-population validity, cross-institution transportability, fairness, or suitability for consequential banking decisions.
+The bundle does not claim universal superiority of any calibration method, causal effects, present-day population validity, cross-institution transportability, fairness, or suitability for consequential banking decisions.
 
 ## Professor review path
 
