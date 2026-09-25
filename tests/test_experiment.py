@@ -1,16 +1,18 @@
 from pathlib import Path
+import io
+import zipfile
 
 import numpy as np
 import pandas as pd
 import pytest
 
 from src.run_experiment import (
+    _extract_bank_full,
     build_models,
     build_preprocessor,
-    dataframe_fingerprint,
     expected_calibration_error,
     normalize_target,
-    paired_bootstrap_interval,
+    paired_seed_differences,
 )
 
 
@@ -60,22 +62,54 @@ def test_model_conditions_are_explicit():
     X = pd.DataFrame({"age": [20, 30, 40, 50], "job": ["a", "b", "a", "b"]})
     assert set(build_models(X, calibration_cv=3)) == {
         "dummy_prior",
-        "uncalibrated",
-        "sigmoid",
-        "isotonic",
+        "logistic_uncalibrated",
+        "logistic_sigmoid",
+        "logistic_isotonic",
     }
 
 
-def test_dataframe_fingerprint_is_deterministic():
-    X = pd.DataFrame({"x": [1, 2], "group": ["a", "b"]})
-    y = pd.Series([0, 1])
-    assert dataframe_fingerprint(X, y) == dataframe_fingerprint(X.copy(), y.copy())
-    assert len(dataframe_fingerprint(X, y)) == 64
+def test_nested_uci_archive_extraction():
+    csv_bytes = b"age;job;y\n20;a;no\n30;b;yes\n"
+    inner_buffer = io.BytesIO()
+    with zipfile.ZipFile(inner_buffer, "w") as inner:
+        inner.writestr("bank-full.csv", csv_bytes)
+    outer_buffer = io.BytesIO()
+    with zipfile.ZipFile(outer_buffer, "w") as outer:
+        outer.writestr("bank.zip", inner_buffer.getvalue())
+    assert _extract_bank_full(outer_buffer.getvalue()) == csv_bytes
 
 
-def test_paired_bootstrap_is_seeded_and_descriptive():
-    a = paired_bootstrap_interval([0.1, 0.0, -0.1, 0.05, -0.05], seed=7, repeats=200)
-    b = paired_bootstrap_interval([0.1, 0.0, -0.1, 0.05, -0.05], seed=7, repeats=200)
-    assert a == b
-    assert a["n_splits"] == 5
-    assert a["ci95_low"] <= a["mean_delta"] <= a["ci95_high"]
+def test_paired_seed_differences_are_descriptive():
+    records = []
+    for i, seed in enumerate([13, 29, 42, 73, 101]):
+        base = 0.10 + i * 0.001
+        records.append({
+            "seed": seed,
+            "metrics": {
+                "logistic_uncalibrated": {
+                    "roc_auc": 0.80,
+                    "average_precision": 0.50,
+                    "brier": base,
+                    "log_loss": 0.30,
+                    "ece_10": 0.04,
+                },
+                "logistic_sigmoid": {
+                    "roc_auc": 0.80,
+                    "average_precision": 0.50,
+                    "brier": base - 0.002,
+                    "log_loss": 0.29,
+                    "ece_10": 0.03,
+                },
+                "logistic_isotonic": {
+                    "roc_auc": 0.79,
+                    "average_precision": 0.49,
+                    "brier": base - 0.001,
+                    "log_loss": 0.295,
+                    "ece_10": 0.035,
+                },
+            },
+        })
+    result = paired_seed_differences(records)
+    assert set(result) == {"logistic_sigmoid", "logistic_isotonic"}
+    assert result["logistic_sigmoid"]["brier"]["mean_delta"] < 0
+    assert "bootstrap_95_ci_of_mean_delta" in result["logistic_sigmoid"]["brier"]
