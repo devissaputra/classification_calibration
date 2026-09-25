@@ -41,6 +41,8 @@ UCI_DATASET_ID = 222
 DATA_URL = "https://archive.ics.uci.edu/static/public/222/bank+marketing.zip"
 DATA_DOI = "10.24432/C5K306"
 DATA_LICENSE = "CC BY 4.0"
+EXPECTED_ROWS = 45211
+EXPECTED_FEATURES = 16
 
 
 def expected_calibration_error(y_true, probabilities, n_bins: int = 10) -> float:
@@ -113,6 +115,11 @@ def load_real_data(data_path: str | Path | None = None, cache_dir: str | Path = 
         raise ValueError("Expected UCI Bank Marketing target column 'y'")
     y = normalize_target(frame.pop("y"))
     X = frame
+    if len(X) != EXPECTED_ROWS or X.shape[1] != EXPECTED_FEATURES:
+        raise ValueError(
+            f"Unexpected bank-full.csv shape: {X.shape}; expected "
+            f"({EXPECTED_ROWS}, {EXPECTED_FEATURES}) predictors"
+        )
     metadata = {
         "name": "UCI Bank Marketing (bank-full.csv)",
         "uci_id": UCI_DATASET_ID,
