@@ -2,45 +2,31 @@
 
 ## Bundle identity
 
-**Area:** AI Engineering  
-**Study:** Probability calibration under class imbalance  
-**Primary dataset:** UCI Bank Marketing, dataset 222  
-**Primary evidence:** repeated untouched-test probabilistic evaluation plus sensitivity analysis
+Area: AI Engineering  
+Study: Probability calibration under class imbalance  
+Primary dataset: UCI Bank Marketing, dataset 222  
+Primary evidence: untouched holdout plus repeated-split and sensitivity analyses
 
-## A run counts as empirical evidence only when it records
+## Evidence required for a valid empirical run
 
-1. canonical UCI source, DOI, license and SHA-256 of the exact \`bank-full.csv\` used;
-2. sample count, feature count and target prevalence;
-3. split seeds, train/test sizes and stratification;
-4. preprocessing fitted only inside training pipelines;
-5. dummy, uncalibrated, sigmoid and isotonic conditions;
-6. ROC-AUC, average precision, Brier score, log loss, ECE-10 and accuracy;
-7. repeated-split summary statistics;
-8. paired calibration deltas relative to uncalibrated logistic regression;
-9. ECE bin sensitivity and calibration-CV sensitivity;
-10. \`duration\` feature ablation;
-11. primary-split error analysis;
-12. environment versions and generated artifacts.
+A full run must record and generate:
 
-## Statistical boundary
-
-Repeated holdouts share observations and are not independent replications. The repository therefore reports descriptive mean/SD and bootstrap intervals over paired split-level deltas but does not label those intervals as formal hypothesis-test confidence intervals and does not report p-values.
+1. UCI dataset identity, DOI, sample count, feature count, target prevalence, and a deterministic fingerprint of the loaded dataframe.
+2. A fixed primary 80/20 stratified holdout using seed 42.
+3. A class-prior dummy baseline plus uncalibrated, sigmoid-calibrated, and isotonic-calibrated logistic regression.
+4. ROC-AUC, average precision, Brier score, log loss, ECE, and accuracy.
+5. Five repeated stratified holdouts using the frozen seed set.
+6. Paired split-level bootstrap intervals for calibrated-minus-uncalibrated metric deltas, reported descriptively rather than as significance tests.
+7. Calibration-fold sensitivity for 3, 5, and 10 folds.
+8. ECE-bin sensitivity for 5, 10, and 20 bins.
+9. An operational ablation that removes duration when that feature is present.
+10. Calibration-bin error analysis.
+11. Generated figures, machine-readable tables, environment versions, offline tests, and CI.
 
 ## Non-claims
 
-The bundle does not claim that one calibration method is universally superior, that this historical dataset represents current banking populations, that the observed associations are causal, or that the model is suitable for consequential decisions.
+The bundle does not claim universal superiority of any calibration method, causal effects, current-population validity, cross-institution transportability, fairness, or suitability for consequential banking decisions.
 
 ## Professor review path
 
-Read in this order:
-
-1. \`README.md\`
-2. \`DATA.md\`
-3. \`src/run_experiment.py\`
-4. \`results/summary.md\`
-5. \`results/metrics.json\`
-6. \`tests/test_experiment.py\`
-7. \`REPRODUCIBILITY.md\`
-8. \`ETHICS.md\`
-9. \`paper/paper.md\`
-10. \`paper/results.md\`
+Read README.md, DATA.md, src/run_experiment.py, tests/test_experiment.py, results/summary.md, paper/paper.md, REPRODUCIBILITY.md, and ETHICS.md in that order.
