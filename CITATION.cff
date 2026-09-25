@@ -1,10 +1,18 @@
 cff-version: 1.2.0
-message: "If you use this repository, please cite the repository and the original UCI dataset."
-title: "Probability Calibration Research Bundle"
+message: "If you use this research bundle, please cite the repository and the original UCI Bank Marketing dataset."
+title: "Probability Calibration Under Class Imbalance: A Reproducible Study on UCI Bank Marketing"
 type: software
 authors:
   - family-names: "Saputra"
-    given-names: "Devis W."
-version: 2.0.0
+    given-names: "Devis Wawan"
+version: 2.1.0
+date-released: 2026-09-25
 license: MIT
 repository-code: "https://github.com/devissaputra/classification_calibration"
+keywords:
+  - probability calibration
+  - uncertainty estimation
+  - reproducible research
+  - logistic regression
+  - UCI Bank Marketing
+  - AI Engineering
