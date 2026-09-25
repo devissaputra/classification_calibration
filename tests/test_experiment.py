@@ -5,13 +5,12 @@ import pandas as pd
 import pytest
 
 from src.run_experiment import (
+    build_models,
     build_preprocessor,
-    error_analysis,
-    evaluate_probabilities,
+    dataframe_fingerprint,
     expected_calibration_error,
-    load_real_data,
     normalize_target,
-    summarize_repeated,
+    paired_bootstrap_interval,
 )
 
 
@@ -39,7 +38,7 @@ def test_target_normalization():
 
 def test_ece_known_values():
     assert expected_calibration_error([0, 0, 1, 1], [0, 0, 1, 1]) == 0
-    assert np.isclose(expected_calibration_error([0, 1], [0.25, 0.75], 2), 0.25)
+    assert np.isclose(expected_calibration_error([0, 1], [.25, .75], 2), .25)
 
 
 def test_ece_rejects_invalid_inputs():
@@ -48,7 +47,7 @@ def test_ece_rejects_invalid_inputs():
     with pytest.raises(ValueError):
         expected_calibration_error([0], [np.nan])
     with pytest.raises(ValueError):
-        expected_calibration_error([0], [1.2])
+        expected_calibration_error([0, 1], [0.2, 1.2])
 
 
 def test_preprocessor_fits_mixed_schema():
@@ -57,34 +56,26 @@ def test_preprocessor_fits_mixed_schema():
     assert transformed.shape[0] == 3
 
 
-def test_local_loader_and_hash(tmp_path):
-    csv = tmp_path / "bank-full.csv"
-    csv.write_text(
-        "age;job;duration;y\n20;a;30;no\n30;b;60;yes\n40;a;90;no\n",
-        encoding="utf-8",
-    )
-    X, y, meta = load_real_data(data_path=csv, cache_dir=tmp_path / "cache")
-    assert X.shape == (3, 3)
-    assert y.tolist() == [0, 1, 0]
-    assert meta["n_samples"] == 3
-    assert len(meta["sha256"]) == 64
+def test_model_conditions_are_explicit():
+    X = pd.DataFrame({"age": [20, 30, 40, 50], "job": ["a", "b", "a", "b"]})
+    assert set(build_models(X, calibration_cv=3)) == {
+        "dummy_prior",
+        "uncalibrated",
+        "sigmoid",
+        "isotonic",
+    }
 
 
-def test_probability_metrics_and_error_analysis():
-    y = np.array([0, 0, 1, 1])
-    p = np.array([0.1, 0.6, 0.4, 0.9])
-    metrics = evaluate_probabilities(y, p)
-    assert {"accuracy", "roc_auc", "average_precision", "brier", "log_loss", "ece_10"} <= metrics.keys()
-    errors = error_analysis(y, p)
-    assert errors["fp"] == 1
-    assert errors["fn"] == 1
+def test_dataframe_fingerprint_is_deterministic():
+    X = pd.DataFrame({"x": [1, 2], "group": ["a", "b"]})
+    y = pd.Series([0, 1])
+    assert dataframe_fingerprint(X, y) == dataframe_fingerprint(X.copy(), y.copy())
+    assert len(dataframe_fingerprint(X, y)) == 64
 
 
-def test_repeated_summary():
-    records = [
-        {"metrics": {"m": {"brier": 0.2, "roc_auc": 0.7}}},
-        {"metrics": {"m": {"brier": 0.1, "roc_auc": 0.9}}},
-    ]
-    summary = summarize_repeated(records)
-    assert np.isclose(summary["m"]["brier"]["mean"], 0.15)
-    assert np.isclose(summary["m"]["roc_auc"]["mean"], 0.8)
+def test_paired_bootstrap_is_seeded_and_descriptive():
+    a = paired_bootstrap_interval([0.1, 0.0, -0.1, 0.05, -0.05], seed=7, repeats=200)
+    b = paired_bootstrap_interval([0.1, 0.0, -0.1, 0.05, -0.05], seed=7, repeats=200)
+    assert a == b
+    assert a["n_splits"] == 5
+    assert a["ci95_low"] <= a["mean_delta"] <= a["ci95_high"]
