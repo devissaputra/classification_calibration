@@ -7,32 +7,36 @@ DOI: https://doi.org/10.24432/C5K306
 Dataset page: https://archive.ics.uci.edu/dataset/222/bank+marketing  
 License reported by UCI: CC BY 4.0.
 
-UCI describes the dataset as direct-marketing campaign data from a Portuguese banking institution, with the binary goal of predicting whether a client subscribed to a term deposit. The repository records the sample and feature counts returned by the loader at run time rather than hard-coding them as experimental evidence.
+The runner retrieves the official UCI archive and extracts bank-full.csv. No raw dataset is committed to this repository.
 
 ## Study role
 
-This is the real external dataset used by the empirical pipeline. No source data are committed to this repository.
+This is the real external dataset used by the empirical calibration study. The runner records the exact SHA-256 of the loaded CSV bytes, source path, observed row count, observed predictor count, and positive-class prevalence.
 
 ## Target
 
-The target is subscription to a term deposit. The runner maps yes to 1 and no to 0 and rejects unexpected target labels.
+The target y indicates whether the client subscribed to a term deposit. The runner maps yes to 1 and no to 0 and rejects unexpected labels.
 
 ## Predictors and preprocessing
 
-Numerical variables are median-imputed and standardized. Categorical variables are mode-imputed and one-hot encoded with unknown-category tolerance. Preprocessing lives inside the estimator pipeline and is fitted on training data only.
+Numerical variables are median-imputed and standardized. Categorical variables are mode-imputed and one-hot encoded with unknown-category tolerance. Preprocessing is fitted inside each training pipeline, not globally before splitting.
 
 ## Split discipline
 
-The primary study uses a fixed stratified 80/20 holdout with seed 42. Calibrators are learned only inside the training partition through cross-validation. The untouched primary test partition is used only for final evaluation.
+The primary study uses a fixed stratified 80/20 holdout with seed 42. Calibrators are learned only inside the training partition through cross-validation. The primary test partition is not used for model fitting or calibrator fitting.
 
 ## Operational feature caveat
 
-The duration variable, when present, is known only after a call occurs. The full protocol therefore repeats the primary experiment after removing duration. This ablation is required for an honest operational interpretation.
+The duration feature records call duration and is not available before a call occurs. It can therefore make retrospective prediction look stronger than a pre-contact decision process could be. The full protocol explicitly reruns the primary experiment after removing duration.
 
-## Provenance fingerprint
+## Local reproducibility
 
-The full runner stores a SHA-256 fingerprint derived from the loaded dataframe content and row order. This is a reproducibility fingerprint of the loaded data representation, not a claim about the raw archive byte hash.
+A local copy can be supplied with:
+
+    PYTHONPATH=. python src/run_experiment.py --data-path /path/to/bank-full.csv
+
+The same raw-file SHA-256 mechanism is applied to a local file.
 
 ## Limitations
 
-This is historical data from one institutional setting. Results should not be interpreted as representative of current banking populations, channels, regulations, or deployment environments.
+The dataset is historical and comes from one institutional setting. It should not be treated as representative of current banking populations, channels, regulations, or deployment environments.
