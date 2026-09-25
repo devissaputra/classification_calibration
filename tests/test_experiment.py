@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 import hashlib
 import io
 import zipfile
@@ -8,6 +9,7 @@ import pandas as pd
 import pytest
 
 from src.run_experiment import (
+    EXPECTED_DATA_SHA256,
     _extract_bank_full,
     build_models,
     build_preprocessor,
@@ -123,3 +125,18 @@ def test_frozen_dataset_hash_guard():
     assert validate_dataset_hash(payload, expected) == expected
     with pytest.raises(ValueError, match="Unexpected bank-full.csv SHA-256"):
         validate_dataset_hash(payload, "0" * 64)
+
+
+def test_committed_empirical_evidence_matches_frozen_protocol():
+    root = Path(__file__).resolve().parents[1]
+    metrics = json.loads((root / "results" / "metrics.json").read_text(encoding="utf-8"))
+    assert metrics["research_bundle"] is True
+    assert metrics["status"] == "complete"
+    assert metrics["dataset"]["sha256"] == EXPECTED_DATA_SHA256
+    assert metrics["dataset"]["n_samples"] == 45211
+    assert metrics["dataset"]["n_features"] == 16
+    assert metrics["protocol"]["repeated_seeds"] == [13, 29, 42, 73, 101]
+    assert len(metrics["repeated_splits"]) == 5
+    generated_tex = (root / "paper" / "results.tex").read_text(encoding="utf-8")
+    assert EXPECTED_DATA_SHA256 in generated_tex
+    assert "Generated empirical results" in generated_tex
