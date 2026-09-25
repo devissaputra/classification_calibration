@@ -1,6 +1,6 @@
 cff-version: 1.2.0
-message: "If you use this repository, please cite the repository and the original UCI dataset source."
-title: "Probability Calibration Under Class Imbalance: UCI Bank Marketing Research Bundle"
+message: "If you use this repository, please cite the repository and the original UCI dataset."
+title: "Probability Calibration Research Bundle"
 type: software
 authors:
   - family-names: "Saputra"
@@ -8,9 +8,3 @@ authors:
 version: 2.0.0
 license: MIT
 repository-code: "https://github.com/devissaputra/classification_calibration"
-keywords:
-  - probability calibration
-  - machine learning
-  - calibration
-  - reproducibility
-  - UCI Bank Marketing
