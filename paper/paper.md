@@ -55,3 +55,12 @@ The study is a methodological benchmark on historical marketing data. It does no
 ## Reproducibility
 
 The executable protocol is src/run_experiment.py. Generated evidence is stored in results/metrics.json, results/repeated_runs.csv, results/summary.md, results/figures, and paper/results.md.
+
+
+## References
+
+- Brier, G. W. (1950). Verification of forecasts expressed in terms of probability. *Monthly Weather Review*, 78(1), 1–3.
+- Niculescu-Mizil, A., & Caruana, R. (2005). Predicting good probabilities with supervised learning. *Proceedings of ICML 2005*, 625–632. DOI: 10.1145/1102351.1102430.
+- Guo, C., Pleiss, G., Sun, Y., & Weinberger, K. Q. (2017). On calibration of modern neural networks. *Proceedings of Machine Learning Research*, 70, 1321–1330.
+- Moro, S., Cortez, P., & Rita, P. (2014). A data-driven approach to predict the success of bank telemarketing. *Decision Support Systems*, 62, 22–31. DOI: 10.1016/j.dss.2014.03.001.
+- Moro, S., Rita, P., & Cortez, P. (2014). *Bank Marketing* [Dataset]. UCI Machine Learning Repository. DOI: 10.24432/C5K306.
