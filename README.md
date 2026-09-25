@@ -1,104 +1,104 @@
-# Probability Calibration Under Class Imbalance
+# Probability Calibration Research Bundle
 
 [![CI](https://github.com/devissaputra/classification_calibration/actions/workflows/ci.yml/badge.svg)](https://github.com/devissaputra/classification_calibration/actions/workflows/ci.yml)
-[![Empirical Study](https://github.com/devissaputra/classification_calibration/actions/workflows/empirical.yml/badge.svg)](https://github.com/devissaputra/classification_calibration/actions/workflows/empirical.yml)
 
 **Research Bundle · AI Engineering · empirical probability calibration**
 
-This repository is a reproducible empirical study of probability calibration under class imbalance using the **UCI Bank Marketing** dataset. The study separates ranking quality from probability quality and tests whether apparent calibration gains remain stable across repeated train/test splits, calibration choices, ECE binning choices, and an operational feature ablation.
+This repository is a reproducible empirical study of probability calibration under class imbalance using the real **UCI Bank Marketing** dataset. The current protocol goes beyond a single demonstration split: it includes a class-prior baseline, repeated stratified holdouts, calibration-method comparison, sensitivity analysis, an operational feature ablation, descriptive paired bootstrap intervals, error analysis, and generated figures.
 
 ## Research question
 
-> How do uncalibrated and calibrated logistic probabilities differ in discrimination and probability quality on UCI Bank Marketing, and how stable are those differences under repeated splits and realistic sensitivity checks?
-
-A classifier can rank observations well while still producing probabilities that are systematically too high or too low. That distinction matters whenever predicted probabilities are interpreted as response likelihoods rather than only as ranking scores.
+How do sigmoid and isotonic calibration change the probability quality and discrimination of logistic regression on UCI Bank Marketing, and how stable are those changes across repeated train/test splits and reasonable calibration choices?
 
 ## Real dataset
 
-**UCI Bank Marketing (dataset 222)** contains records from direct-marketing campaigns of a Portuguese banking institution. The full \`bank-full.csv\` version has 45,211 observations, 16 predictors and one binary target indicating whether a client subscribed to a term deposit. UCI reports a CC BY 4.0 license and DOI \`10.24432/C5K306\`.
+**UCI Bank Marketing, dataset 222**
 
-The runner downloads the canonical UCI archive when no local copy is supplied, extracts \`bank-full.csv\`, caches it outside version control, and records a SHA-256 hash of the exact CSV used. See [DATA.md](DATA.md).
+- source: UCI Machine Learning Repository
+- task: binary prediction of term-deposit subscription
+- canonical file used by the runner: bank-full.csv
+- DOI: 10.24432/C5K306
+- license reported by UCI: CC BY 4.0
+- official archive: downloaded directly by the runner
+- provenance: the exact raw CSV SHA-256 is recorded in results/metrics.json
 
-## Study design
+No copy of the source dataset is committed. See DATA.md.
 
-### Primary conditions
+## Frozen empirical design
 
-1. \`dummy_prior\` — class-prior probability baseline.
-2. \`logistic_uncalibrated\` — leakage-aware mixed-type preprocessing plus logistic regression.
-3. \`logistic_sigmoid\` — the same logistic learner with five-fold sigmoid calibration inside training data.
-4. \`logistic_isotonic\` — the same logistic learner with five-fold isotonic calibration inside training data.
+1. Download and extract bank-full.csv from the official UCI archive, or use a user-supplied local copy.
+2. Validate and normalize the binary target.
+3. Use a fixed stratified 80/20 primary holdout with seed 42.
+4. Fit preprocessing only inside the training pipeline.
+5. Compare four conditions:
+   - class-prior dummy baseline
+   - uncalibrated logistic regression
+   - sigmoid-calibrated logistic regression
+   - isotonic-calibrated logistic regression
+6. Repeat the holdout protocol with seeds 13, 29, 42, 73, and 101.
+7. Report ROC-AUC, average precision, Brier score, log loss, ECE-10, and accuracy.
+8. Report descriptive paired bootstrap intervals for calibrated-minus-uncalibrated split-level metric deltas.
+9. Test calibration-CV sensitivity at 3, 5, and 10 folds.
+10. Test ECE sensitivity at 5, 10, and 20 bins.
+11. Repeat the primary experiment without duration because that feature is unavailable before a marketing call occurs.
+12. Report primary-split confusion counts and high-confidence errors.
+13. Generate machine-readable results, a professor-facing summary, and calibration, ROC, and precision-recall figures.
 
-### Evaluation
+## Run the full study
 
-- fixed primary split: seed 42;
-- repeated stratified 80/20 holdouts: seeds 13, 29, 42, 73 and 101;
-- ROC-AUC and average precision for ranking;
-- Brier score, log loss and ECE-10 for probability quality;
-- accuracy at a 0.5 threshold as a secondary descriptive metric;
-- paired split-level deltas against uncalibrated logistic regression;
-- descriptive bootstrap intervals over paired split-level deltas, with **no p-value claim** because repeated holdouts are not independent.
+    python -m venv .venv
+    source .venv/bin/activate
+    pip install -r requirements.txt
+    PYTHONPATH=. pytest -q
+    PYTHONPATH=. python src/run_experiment.py
 
-### Sensitivity and ablation
+For a fast smoke run using only the primary split:
 
-- calibration CV sensitivity: 3, 5 and 10 folds;
-- ECE bin sensitivity: 5, 10 and 20 equal-width bins;
-- operational ablation: rerun without \`duration\`, because call duration is not known before a marketing call is completed;
-- primary-split error analysis including FP, FN and high-confidence errors.
+    PYTHONPATH=. python src/run_experiment.py --quick
 
-## Run the study
+## Generated evidence
 
-\`\`\`bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-PYTHONPATH=. pytest -q
-PYTHONPATH=. python src/run_experiment.py
-\`\`\`
+A successful full run produces:
 
-For a faster networked empirical run:
+- results/metrics.json
+- results/repeated_runs.csv
+- results/summary.md
+- results/figures/calibration_curve.png
+- results/figures/roc_curve.png
+- results/figures/precision_recall_curve.png
+- paper/results.md
 
-\`\`\`bash
-PYTHONPATH=. python src/run_experiment.py --quick
-\`\`\`
+The JSON file contains the full calibration-fold sensitivity, ECE-bin sensitivity, duration ablation, error analysis, repeated-split summary, and paired-delta uncertainty results.
 
-The full runner writes:
+## Why this qualifies as a Research Bundle
 
-\`\`\`text
-results/metrics.json
-results/repeated_runs.csv
-results/summary.md
-results/figures/calibration_curve.png
-results/figures/roc_curve.png
-results/figures/precision_recall_curve.png
-paper/results.md
-\`\`\`
+The repository contains a real external dataset with provenance, a frozen protocol, multiple baselines, repeated experiments, sensitivity checks, operational ablation, uncertainty reporting, error analysis, reproducible code, offline tests, CI, an empirical workflow, a manuscript scaffold, and explicit interpretation limits.
 
-The GitHub \`Empirical Study\` workflow reruns the full study after material changes to the runner and commits regenerated result artifacts. Numerical results should therefore come from the executable protocol rather than hand-edited prose.
-
-## Research-bundle evidence
-
-This repository includes a falsifiable empirical question, canonical real-data provenance and checksum capture, leakage-aware preprocessing, explicit baselines, repeated holdout evaluation, calibration-method sensitivity, ECE-bin sensitivity, an operational feature ablation, error analysis, machine-readable outputs, offline CI, a separate empirical workflow, and reproducibility/ethics documentation.
-
-See [RESEARCH_BUNDLE.md](RESEARCH_BUNDLE.md) for the evidence contract.
+See RESEARCH_BUNDLE.md for the evidence contract.
 
 ## Interpretation boundary
 
-This is a methodology study, **not a banking decision system**. The target is historical marketing response. Results do not justify credit decisions, customer exclusion, eligibility decisions or automated targeting. Calibration can shift across time, institutions, populations and acquisition channels.
+This is a methodology study, not a banking decision system. The dataset is historical and institution-specific. The results do not establish causal effects, fairness, current-population validity, transportability, or suitability for consequential financial decisions.
 
-## Professor review path
+## Repository map
 
-1. [README.md](README.md)
-2. [DATA.md](DATA.md)
-3. [src/run_experiment.py](src/run_experiment.py)
-4. [results/summary.md](results/summary.md)
-5. [results/metrics.json](results/metrics.json)
-6. [REPRODUCIBILITY.md](REPRODUCIBILITY.md)
-7. [ETHICS.md](ETHICS.md)
-8. [paper/paper.md](paper/paper.md)
-9. [paper/results.md](paper/results.md)
+    README.md                     study overview
+    RESEARCH_BUNDLE.md            evidence contract
+    DATA.md                       dataset provenance
+    REPRODUCIBILITY.md            frozen rerun protocol
+    ETHICS.md                     responsible-use boundary
+    src/run_experiment.py         full empirical runner
+    tests/test_experiment.py      offline behavioral tests
+    results/metrics.json          full machine-readable evidence
+    results/repeated_runs.csv     split-level metrics
+    results/summary.md            generated professor-facing results
+    results/figures/              generated empirical figures
+    paper/paper.md                manuscript scaffold
+    paper/results.md              generated paper results
+    CITATION.cff                  software citation
 
 ## Citation
 
-Moro, S., Rita, P., & Cortez, P. (2014). *Bank Marketing* [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5K306
+Dataset: Moro, S., Rita, P., & Cortez, P. (2014). Bank Marketing. UCI Machine Learning Repository. https://doi.org/10.24432/C5K306
 
-Repository citation metadata is in [CITATION.cff](CITATION.cff).
+Code and study design: see CITATION.cff.
