@@ -2,7 +2,7 @@
 
 ## Abstract
 
-Probability calibration can look convincing on a single split while remaining sensitive to the split, calibration procedure, and calibration metric. This study compares a class-prior baseline and logistic regression under uncalibrated, sigmoid-calibrated, and isotonic-calibrated conditions on UCI Bank Marketing. The protocol combines an untouched primary holdout, five repeated stratified holdouts, multiple probability-quality metrics, calibration-fold sensitivity, ECE-bin sensitivity, an operational feature ablation, calibration-bin error analysis, and descriptive paired bootstrap intervals. Numerical results are generated directly by the executable pipeline.
+Probability calibration can look convincing on a single split while remaining sensitive to the split, calibration procedure, and calibration metric. This study compares a class-prior baseline and logistic regression under uncalibrated, sigmoid-calibrated, and isotonic-calibrated conditions on UCI Bank Marketing. The protocol combines an untouched primary holdout, five repeated stratified holdouts, multiple probability-quality metrics, calibration-fold sensitivity, ECE-bin sensitivity, an operational feature ablation, primary-split error analysis, and descriptive paired bootstrap intervals. Numerical results are generated directly by the executable pipeline.
 
 ## Research question
 
@@ -10,7 +10,7 @@ How do sigmoid and isotonic calibration alter logistic-regression probability qu
 
 ## Data
 
-The study uses UCI Bank Marketing, dataset 222, DOI 10.24432/C5K306, licensed CC BY 4.0. The runner records the returned sample count, feature count, positive-class prevalence, and a deterministic SHA-256 fingerprint of the loaded dataframe representation.
+The study uses UCI Bank Marketing, dataset 222, DOI 10.24432/C5K306, licensed CC BY 4.0. The runner extracts bank-full.csv from the official UCI archive and records the exact raw CSV SHA-256, sample count, predictor count, and positive-class prevalence.
 
 ## Methods
 
@@ -28,19 +28,19 @@ The primary split uses seed 42 with a stratified 80/20 partition. Robustness is 
 
 ### Sensitivity analyses
 
-The study varies calibration cross-validation folds across 3, 5, and 10 and recomputes ECE with 5, 10, and 20 equal-width bins. The primary design is also rerun without duration when that feature is present because call duration is unavailable before the contact has occurred.
+The study varies calibration cross-validation folds across 3, 5, and 10 and recomputes ECE with 5, 10, and 20 equal-width bins. The primary design is also rerun without duration because call duration is unavailable before a marketing call occurs.
 
 ### Uncertainty reporting
 
-Repeated holdouts reuse observations and are not independent experiments. The study therefore reports descriptive means, standard deviations, and paired split-level bootstrap intervals without p-values or claims of formal statistical significance.
+Repeated holdouts reuse observations and are not independent experiments. The study therefore reports descriptive means and standard deviations plus paired split-level bootstrap intervals over 4,000 resamples, without p-values or claims of formal statistical significance.
 
 ### Error analysis
 
-For each primary model, the runner aggregates the untouched test predictions into calibration bins and reports bin size, mean predicted probability, observed event rate, and absolute calibration gap.
+For each primary model, the runner records confusion counts, overall error rate, number of errors made with at least 0.80 prediction confidence, and the mean predicted probability among false positives and false negatives when those error types are present.
 
 ## Results
 
-Generated numerical results are written to paper/results.md and results/summary.md. The manuscript intentionally avoids hand-entered performance values.
+Generated numerical results are written to paper/results.md and results/summary.md. The complete sensitivity, ablation, error-analysis, environment, and uncertainty records are stored in results/metrics.json. The manuscript intentionally avoids hand-entered performance values.
 
 ## Validity and limitations
 
@@ -48,4 +48,4 @@ The study is a methodological benchmark on historical marketing data. It does no
 
 ## Reproducibility
 
-The executable protocol is src/run_experiment.py. Full evidence is stored in results/metrics.json, results/repeated_runs.csv, results/sensitivity_cv.csv, results/sensitivity_ece.csv, results/ablation.csv, results/error_analysis.csv, results/summary.md, results/figures, and paper/results.md.
+The executable protocol is src/run_experiment.py. Generated evidence is stored in results/metrics.json, results/repeated_runs.csv, results/summary.md, results/figures, and paper/results.md.
