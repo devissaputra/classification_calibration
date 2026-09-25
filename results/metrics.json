@@ -1,8 +1,11 @@
 {
   "research_bundle": true,
-  "status": "regenerate_required",
-  "message": "The previous packaged-benchmark metrics were intentionally removed. Run src/run_experiment.py against UCI Bank Marketing to generate valid empirical results.",
-  "dataset": "UCI Bank Marketing",
-  "uci_id": 222,
-  "doi": "10.24432/C5K306"
+  "status": "regeneration_required_after_protocol_upgrade",
+  "dataset": {
+    "name": "UCI Bank Marketing (bank-full.csv)",
+    "uci_id": 222,
+    "doi": "10.24432/C5K306",
+    "license": "CC BY 4.0"
+  },
+  "message": "Run src/run_experiment.py with the canonical UCI data. Previous demo metrics are not valid for the upgraded repeated-split protocol."
 }
