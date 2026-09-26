@@ -1,3 +1,7 @@
+# Calculation reading guide: ../CALCULATIONS.md (repository root).
+# Brier = mean((p - y)^2); ECE = sum(bin share × |mean p - mean y|).
+# Lower Brier and log loss indicate better probability predictions. ECE depends on the chosen bins; a constant prevalence forecast can have low ECE while having no discrimination. Split bootstrap intervals are descriptive because holdouts overlap.
+
 from __future__ import annotations
 
 import argparse

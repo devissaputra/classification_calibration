@@ -64,3 +64,33 @@ The executable protocol is src/run_experiment.py. Generated evidence is stored i
 - Guo, C., Pleiss, G., Sun, Y., & Weinberger, K. Q. (2017). On calibration of modern neural networks. *Proceedings of Machine Learning Research*, 70, 1321–1330.
 - Moro, S., Cortez, P., & Rita, P. (2014). A data-driven approach to predict the success of bank telemarketing. *Decision Support Systems*, 62, 22–31. DOI: 10.1016/j.dss.2014.03.001.
 - Moro, S., Rita, P., & Cortez, P. (2014). *Bank Marketing* [Dataset]. UCI Machine Learning Repository. DOI: 10.24432/C5K306.
+
+
+## Calculation definitions and evidence audit
+
+Brier = mean((p - y)^2); ECE = sum(bin share × |mean p - mean y|).
+
+Lower Brier and log loss indicate better probability predictions. ECE depends on the chosen bins; a constant prevalence forecast can have low ECE while having no discrimination. Split bootstrap intervals are descriptive because holdouts overlap.
+
+Isotonic calibration reduces mean Brier score from 0.0720 to 0.0693 across five holdouts, while ROC-AUC stays near 0.906. This supports a probability-quality improvement under the frozen protocol, rather than a substantial change in ranking. The call-duration ablation matters operationally because duration is unavailable before a call; results using it describe a retrospective task.
+
+The [calculation guide](../CALCULATIONS.md) provides exact evidence paths and a function-level implementation map.
+
+![Study design](../assets/review_overview.svg)
+
+![Calculation and selected evidence](../assets/review_calculations.svg)
+
+### Selected evidence and interpretation
+
+| Quantity | Value | Unit / meaning | JSON path |
+|---|---:|---|---|
+| dummy_prior | 0.10330837430613315 | mean Brier ↓ | `repeated_summary.dummy_prior.brier.mean` |
+| uncalibrated | 0.07198757353865393 | mean Brier ↓ | `repeated_summary.logistic_uncalibrated.brier.mean` |
+| sigmoid | 0.07197467863115595 | mean Brier ↓ | `repeated_summary.logistic_sigmoid.brier.mean` |
+| isotonic | 0.06927224756658759 | mean Brier ↓ | `repeated_summary.logistic_isotonic.brier.mean` |
+
+These values are read from `results/metrics.json`. They must be interpreted with the split, data status and limitations above. The complete data/model experiment was not rerun in this review. Stored empirical results were inspected, not independently reproduced from raw data.
+
+### Reproduction and claim boundaries
+
+The existing suite requires unavailable dependencies; no full-suite pass is claimed. The figure generator can be checked with `python scripts/build_review_figures.py --check`. This verifies the displayed calculation evidence, not an independent replication of the complete scientific experiment. The manuscript is a working report, not a peer-reviewed publication.

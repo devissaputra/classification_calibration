@@ -1,10 +1,7 @@
-# Portfolio Positioning
+# Probability Calibration
 
-**Primary tag:** AI Engineering  
-**Artifact type:** Empirical Research Bundle  
-**Research theme:** uncertainty, probability calibration, reproducibility, and deployment-aware evaluation  
-**External data:** UCI Bank Marketing, dataset 222
+This study asks a more demanding question than whether a classifier is simply accurate: when a model assigns a probability, does that number match what actually happens? Using the UCI Bank Marketing dataset with 45,211 observations, 16 predictors, and an 11.7% positive class, the protocol compares a class-prior baseline with uncalibrated, sigmoid-calibrated, and isotonic-calibrated logistic regression across five fixed stratified holdouts. Discrimination is evaluated separately from probability quality using ROC-AUC and average precision alongside Brier score, log loss, and expected calibration error.
 
-This repository demonstrates an end-to-end empirical research workflow rather than a tutorial notebook: externally sourced real data with frozen byte-level provenance, train-only preprocessing, controlled calibration comparisons, repeated holdout robustness checks, calibration and metric sensitivity analyses, an operational feature ablation, error analysis, machine-readable results, generated manuscript outputs, offline tests, and a networked empirical CI workflow.
+Isotonic calibration reduces mean Brier score from 0.0720 to 0.0693 across five holdouts, while ROC-AUC stays near 0.906. This supports a probability-quality improvement under the frozen protocol, rather than a substantial change in ranking. The call-duration ablation matters operationally because duration is unavailable before a call; results using it describe a retrospective task.
 
-For professor or hiring-manager review, the recommended path is README.md → DATA.md → src/run_experiment.py → results/summary.md → RESEARCH_BUNDLE.md → paper/paper.md.
+See [CALCULATIONS.md](CALCULATIONS.md) for evidence and verification scope.

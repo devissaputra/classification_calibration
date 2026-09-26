@@ -50,4 +50,10 @@ The executable protocol is \texttt{src/run\_experiment.py}. Generated evidence i
 
 \bibliographystyle{plain}
 \bibliography{references}
+\section{Calculation audit and reproduction scope}
+Isotonic calibration reduces mean Brier score from 0.0720 to 0.0693 across five holdouts, while ROC-AUC stays near 0.906. This supports a probability-quality improvement under the frozen protocol, rather than a substantial change in ranking. The call-duration ablation matters operationally because duration is unavailable before a call; results using it describe a retrospective task.
+
+Lower Brier and log loss indicate better probability predictions. ECE depends on the chosen bins; a constant prevalence forecast can have low ECE while having no discrimination. Split bootstrap intervals are descriptive because holdouts overlap.
+
+See the repository calculation guide for exact source paths. The full experiment was not independently rerun during this documentation review.
 \end{document}
